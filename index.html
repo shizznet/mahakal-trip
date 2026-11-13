@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mahakal and Malwa Family Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one narrow column; a "next up" card on top, then each day as a dated checklist with a Navigate link per stop. */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --ink:#16222e; --muted:#5a6b7b; --line:#d9e0e7;
+  --river:#0f5e73; --river-soft:#e1eff2; --marigold:#d98a00; --marigold-soft:#fdf1d8;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f161d; --surface:#18222c; --ink:#e8eef3; --muted:#9aabba; --line:#2b3947;
+    --river:#6cc4d6; --river-soft:#173640; --marigold:#f2b544; --marigold-soft:#3a2d10;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f161d; --surface:#18222c; --ink:#e8eef3; --muted:#9aabba; --line:#2b3947;
+  --river:#6cc4d6; --river-soft:#173640; --marigold:#f2b544; --marigold-soft:#3a2d10;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+main{max-width:760px;margin:0 auto;padding:28px 16px 64px;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,6vw,2.9rem);font-weight:700}
+h2{font-size:1.4rem;font-weight:700}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+a{color:var(--river)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+.eyebrow{font-weight:600;color:var(--river);letter-spacing:.04em;text-transform:uppercase;font-size:.85rem}
+.lead{color:var(--muted);max-width:60ch}
+.muted{color:var(--muted);font-size:.95rem}
+.top{display:flex;flex-direction:column;gap:10px}
+
+.route{display:flex;flex-wrap:wrap;gap:6px 0;align-items:center;list-style:none;margin:0;padding:14px 16px;background:var(--river-soft);border-radius:12px;font-weight:600}
+.route li{display:flex;align-items:center}
+.route li+li::before{content:"";width:18px;height:2px;background:var(--river);margin:0 8px;opacity:.6}
+.route .nights{font-weight:400;color:var(--muted);margin-left:6px;font-size:.9rem}
+
+.next{background:var(--river);color:var(--surface);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.next .eyebrow{color:inherit;opacity:.85}
+.next .what{font-family:var(--display);font-size:1.35rem;font-weight:700;line-height:1.2}
+.next .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.next a{background:var(--surface);color:var(--river);text-decoration:none;font-weight:600;padding:8px 14px;border-radius:999px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--marigold);width:0;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+.overall{display:flex;flex-direction:column;gap:6px}
+.overall .labels{display:flex;justify-content:space-between;font-size:.95rem}
+
+.daynav{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.daynav a{display:block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);text-decoration:none;font-weight:600;font-size:.92rem;color:var(--ink)}
+.daynav a:hover{border-color:var(--river);color:var(--river)}
+.daynav a.today{background:var(--marigold-soft);border-color:var(--marigold)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.trains{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.train{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.train .no{font-family:var(--display);font-weight:700;font-size:1.05rem}
+.train .times{font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:420px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+
+.day{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;scroll-margin-top:12px}
+.dayhead{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dayhead .grow{flex:1;min-width:0}
+.date{flex:none;width:58px;text-align:center;background:var(--river);color:var(--surface);border-radius:10px;padding:6px 0;font-family:var(--display);line-height:1.1}
+.date b{display:block;font-size:1.45rem}
+.date span{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+.stay{color:var(--muted);font-size:.95rem;margin-top:2px}
+.count{flex:none;font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted);font-size:.95rem}
+.day.key{border-color:var(--marigold)}
+.day.key .date{background:var(--marigold);color:#1c1300}
+.day.today{box-shadow:0 0 0 3px var(--marigold-soft)}
+.tag{display:inline-block;background:var(--marigold-soft);color:var(--ink);border:1px solid var(--marigold);border-radius:999px;font-size:.78rem;font-weight:600;padding:1px 9px;margin-left:6px;vertical-align:middle;font-family:var(--body)}
+
+.stops,.checks{list-style:none;margin:0;padding:8px 20px 12px;display:flex;flex-direction:column}
+.checks{padding:0}
+.stop{display:grid;grid-template-columns:28px 84px 1fr auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.stop:last-child{border-bottom:0}
+.checks .stop{grid-template-columns:28px 1fr}
+.stop input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--river);cursor:pointer}
+.stop time{font-variant-numeric:tabular-nums;font-weight:600;color:var(--river);white-space:nowrap}
+.stop label{cursor:pointer}
+.stop b{font-weight:600}
+.stop small{display:block;color:var(--muted);font-size:.93rem}
+.stop.done b,.stop.done small,.stop.done time{color:var(--muted);text-decoration:line-through}
+.nav{white-space:nowrap;text-decoration:none;font-weight:600;font-size:.9rem;border:1px solid var(--river);border-radius:999px;padding:4px 12px;color:var(--river)}
+.nav:hover{background:var(--river-soft)}
+.note{margin:0 20px 14px;padding:10px 14px;background:var(--marigold-soft);border-left:3px solid var(--marigold);border-radius:6px;font-size:.95rem}
+.notes{padding:0 20px 18px;display:flex;flex-direction:column;gap:6px}
+.notes label{font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+textarea{width:100%;min-height:58px;resize:vertical;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+
+.facts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.facts li{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.facts b{display:block;font-family:var(--display);font-size:1.15rem}
+button{font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px}
+button:hover{border-color:var(--river)}
+footer{color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+@media (max-width:480px){
+  .stop{grid-template-columns:28px 1fr auto}
+  .stop time{grid-column:2;grid-row:1;font-size:.9rem}
+  .stop label{grid-column:2;grid-row:2}
+  .stop .nav{grid-column:3;grid-row:1 / span 2;align-self:center}
+  .dayhead{padding:14px 16px}.stops{padding:6px 16px 10px}.note{margin:0 16px 12px}.notes{padding:0 16px 16px}
+}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+  <p class="eyebrow">Family trip · 12 to 19 December 2026</p>
+  <h1>Mahakal and Malwa</h1>
+  <p class="lead">Six days in Madhya Pradesh, built around Mahakaleshwar darshan and aarti on Monday 14 December. Tick each stop as you finish it and tap Navigate to open Google Maps.</p>
+</div>
+
+<section class="next" id="next" aria-live="polite"></section>
+
+<div class="overall">
+  <div class="labels"><span>Trip progress</span><span id="overallText"></span></div>
+  <div class="bar"><i id="overallBar"></i></div>
+</div>
+
+<ol class="route" aria-label="Route">
+  <li>Mumbai</li>
+  <li>Ujjain<span class="nights">2 nights</span></li>
+  <li>Omkareshwar</li>
+  <li>Maheshwar<span class="nights">1 night</span></li>
+  <li>Mandu<span class="nights">1 night</span></li>
+  <li>Indore<span class="nights">1 night</span></li>
+  <li>Mumbai</li>
+</ol>
+
+<nav aria-label="Jump to a day"><ul class="daynav" id="daynav"></ul></nav>
+
+<section class="panel">
+  <h2>Trains</h2>
+  <div class="trains">
+    <div class="train">
+      <span class="eyebrow">Outbound · Sat 12 Dec</span>
+      <span class="no">12227 Indore Duronto</span>
+      <span class="times">Mumbai Central 11:10 PM → Indore Jn 10:20 AM (Sun)</span>
+      <span class="muted">Third AC, coach B2. Veg catering is booked.</span>
+    </div>
+    <div class="train">
+      <span class="eyebrow">Return · Fri 18 Dec</span>
+      <span class="no">12228 Mumbai Duronto</span>
+      <span class="times">Indore Jn 9:00 PM → Mumbai Central 8:20 AM (Sat)</span>
+      <span class="muted">Second AC, coach A3. Booked without food, so eat dinner before boarding.</span>
+    </div>
+  </div>
+  <p class="muted">Times can change. Check on the day by dialling 139.</p>
+</section>
+
+<section class="panel">
+  <h2>Where we stay</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Nights</th><th>Place</th><th>Book near</th></tr></thead>
+    <tbody>
+      <tr><td>13 and 14 Dec</td><td>Ujjain</td><td>Walking distance of the Mahakal gate</td></tr>
+      <tr><td>15 Dec</td><td>Maheshwar</td><td>The fort and ghats</td></tr>
+      <tr><td>16 Dec</td><td>Mandu</td><td>Anywhere in the village</td></tr>
+      <tr><td>17 Dec</td><td>Indore</td><td>Rajwada or the station; keep the room until 7 PM on the 18th</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted">Car: one vehicle from the Indore station pickup on the 13th to the Indore drop on the 17th.</p>
+</section>
+
+<div id="days" style="display:flex;flex-direction:column;gap:24px"></div>
+
+<section class="panel">
+  <h2>Book before we go</h2>
+  <ul class="checks" id="book"></ul>
+</section>
+
+<section class="panel">
+  <h2>Carry with you</h2>
+  <ul class="checks" id="pack"></ul>
+</section>
+
+<section class="panel">
+  <h2>Handy numbers</h2>
+  <ul class="facts">
+    <li><b>112</b>Emergency (police, ambulance, fire)</li>
+    <li><b>139</b>Railway enquiry and Rail Madad</li>
+    <li><b>14646</b>IRCTC e-ticket customer care</li>
+  </ul>
+</section>
+
+<footer>
+  <p>Ticks and notes are saved on this phone only. Each person's phone keeps its own.</p>
+  <p>Temple and monument timings were checked on 13 November 2026 and can change. Confirm them a day or two before travel. Drive times are estimates.</p>
+  <button type="button" id="reset">Clear all ticks and notes</button>
+</footer>
+</main>
+
+<script>
+(function(){
+  var DAYS=[
+    {id:"sun-13",iso:"2026-12-13",d:"13",w:"Sun",title:"Indore to Ujjain",stay:"Stay: Ujjain",stops:[
+      ["10:20 AM","Arrive Indore Jn","Drive straight to Ujjain, about 55 km and 1.5 hours.","Ujjain Junction railway station"],
+      ["12:30 PM","Check in, lunch and rest","",""],
+      ["3:30 PM","Kal Bhairav Temple","North side of town, about 30 minutes.","Kal Bhairav Temple Ujjain"],
+      ["4:15 PM","Sandipani Ashram","Close to Kal Bhairav.","Sandipani Ashram Ujjain"],
+      ["5:00 PM","Mangalnath Temple","","Mangalnath Temple Ujjain"],
+      ["6:00 PM","Harsiddhi Temple","","Harsiddhi Mata Temple Ujjain"],
+      ["7:00 PM","Ram Ghat aarti","A short walk from Harsiddhi.","Ram Ghat Ujjain"],
+      ["8:00 PM","Dinner and early to bed","Monday starts at 1 AM.",""]
+    ]},
+    {id:"mon-14",iso:"2026-12-14",d:"14",w:"Mon",key:true,title:"Mahakaleshwar day",stay:"Stay: Ujjain",
+     note:"No Bhasma passes? Go for morning darshan by 7:00 AM with the ₹250 Sheeghra Darshan pass, and keep the Sandhya Aarti in the evening.",stops:[
+      ["1:00 AM","Wake and bathe","Walk to the temple gate by 1:30 AM.","Mahakaleshwar Jyotirlinga Temple Ujjain"],
+      ["4:00 AM","Bhasma Aarti","Runs until 6:00 AM. Needs an advance online pass, ₹200 per person.",""],
+      ["6:30 AM","Back to the hotel","Breakfast, then sleep until about 11.",""],
+      ["12:00 PM","Book Sandhya Aarti online, then lunch","Same-day booking opens at noon, ₹250 per person.",""],
+      ["3:00 PM","Vedh Shala","Optional. Skip and rest if the children are tired.","Jantar Mantar Vedh Shala Ujjain"],
+      ["4:00 PM","Chintaman Ganesh","Optional.","Chintaman Ganesh Temple Ujjain"],
+      ["5:15 PM","Mahakal darshan and Sandhya Aarti","Last entry for the aarti is 6:00 PM.","Mahakaleshwar Jyotirlinga Temple Ujjain"],
+      ["After aarti","Mahakal Lok by night, then dinner","","Shri Mahakal Lok Ujjain"],
+      ["If time","Gopal Mandir","In the market, 10 minutes from Mahakal.","Gopal Mandir Ujjain"]
+    ]},
+    {id:"tue-15",iso:"2026-12-15",d:"15",w:"Tue",title:"Omkareshwar, then Maheshwar",stay:"Stay: Maheshwar",stops:[
+      ["6:30 AM","Leave Ujjain","About 4 hours via Indore. Breakfast on the way.","Omkareshwar Jyotirlinga Temple"],
+      ["10:30 AM","Omkareshwar Jyotirlinga","Darshan pauses from 12:20 to 1:15 PM, so join the queue on arrival.","Omkareshwar Jyotirlinga Temple"],
+      ["12:30 PM","Mamleshwar Temple and lunch","On the south bank; it completes the darshan.","Mamleshwar Temple Omkareshwar"],
+      ["1:45 PM","Drive to Maheshwar","About 2 hours.","Ahilya Fort Maheshwar"],
+      ["3:45 PM","Check in and rest","",""],
+      ["5:00 PM","Narmada ghats and boat ride","Sunset from the water, below Ahilya Fort.","Ahilya Ghat Maheshwar"],
+      ["7:30 PM","Narmada aarti","Be at the ghat by 7:30; it runs to about 8.","Ahilya Ghat Maheshwar"]
+    ]},
+    {id:"wed-16",iso:"2026-12-16",d:"16",w:"Wed",title:"Maheshwar to Mandu",stay:"Stay: Mandu",stops:[
+      ["8:30 AM","Ahilya Fort and Rajwada","","Ahilya Fort Maheshwar"],
+      ["10:00 AM","Rehwa Society and saree shopping","The children can watch the handlooms at work.","Rehwa Society Maheshwar"],
+      ["12:00 PM","Early lunch, then leave for Mandu","About 2 hours.","Jahaz Mahal Mandu"],
+      ["2:15 PM","Check in at Mandu","",""],
+      ["3:00 PM","Jahaz Mahal and Hindola Mahal","One complex on one ticket. Allow 1.5 hours.","Jahaz Mahal Mandu"],
+      ["4:45 PM","Roopmati Pavilion for sunset","About 5 km away; it closes at 6 PM.","Rani Roopmati Pavilion Mandu"],
+      ["7:30 PM","Dal Paniya dinner","",""]
+    ]},
+    {id:"thu-17",iso:"2026-12-17",d:"17",w:"Thu",title:"Mandu to Indore",stay:"Stay: Indore",stops:[
+      ["8:30 AM","Jami Masjid and Hoshang Shah's Tomb","Village centre, unhurried, after breakfast.","Jami Masjid Mandu"],
+      ["9:45 AM","Baz Bahadur Palace","","Baz Bahadur Palace Mandu"],
+      ["11:30 AM","Leave for Indore","About 2.5 hours.","Rajwada Palace Indore"],
+      ["2:00 PM","Check in, lunch and rest","",""],
+      ["5:30 PM","Kanch Mandir","","Kanch Mandir Indore"],
+      ["6:15 PM","Rajwada","Ask here for the light show time.","Rajwada Palace Indore"],
+      ["8:30 PM","Sarafa Bazaar","The food stalls open once the jewellery shops shut.","Sarafa Bazaar Indore"]
+    ]},
+    {id:"fri-18",iso:"2026-12-18",d:"18",w:"Fri",title:"Indore, then the night train",stay:"Night on the train",stops:[
+      ["10:00 AM","Indore Zoo","About 2.5 hours with the children.","Kamla Nehru Prani Sangrahalaya Indore Zoo"],
+      ["12:45 PM","Lunch at Chappan Dukan","","56 Dukan Indore"],
+      ["2:00 PM","Rest at the hotel","",""],
+      ["3:30 PM","Lal Bagh Palace","Closes at 5 PM.","Lal Bagh Palace Indore"],
+      ["6:30 PM","Early dinner and collect bags","",""],
+      ["8:15 PM","Reach Indore Jn","The Duronto leaves at 9:00 PM.","Indore Junction railway station"]
+    ]}
+  ];
+  var BOOK=[
+    ["Bhasma Aarti pass for Mon 14 Dec","Booking opens Sat 14 Nov at 8:00 AM on shrimahakaleshwar.com, 30 days ahead. Have everyone's ID details ready and check the rules for children and the dress code."],
+    ["Ujjain hotel, 13 and 14 Dec","Within walking distance of the Mahakal gate, with early check-in on the 13th."],
+    ["Hotels in Maheshwar, Mandu and Indore","Ask Indore for a late check-out on the 18th."],
+    ["Car with driver, 13 to 17 Dec","Sized for the whole group and luggage."],
+    ["Omkareshwar quick darshan","The temple trust takes online Shighra Darshan bookings by time slot."]
+  ];
+  var PACK=[
+    ["Original photo ID for every adult","Needed on the train and for aarti passes."],
+    ["Train tickets and aarti passes","Saved offline on two phones."],
+    ["Warm layers","December nights and the 1 AM start are cold."],
+    ["Temple clothes for Bhasma Aarti","Follow the dress code shown on the pass."],
+    ["Cash in small notes","For offerings, boats, lockers and street food."],
+    ["Snacks and water for the children","For the long drives on the 15th and 17th."],
+    ["Power bank and chargers",""],
+    ["Basic medicines","Motion sickness, fever and stomach."]
+  ];
+
+  var KEY="malwa-trip-v1", state={done:{},notes:{}};
+  try{var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&s.done){state=s; state.notes=state.notes||{};}}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+  function nav(q){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(q+", Madhya Pradesh");}
+  function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
+  function pad(n){return n<10?"0"+n:""+n;}
+  var now=new Date(), todayIso=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+
+  function row(id,time,name,note,q){
+    var on=!!state.done[id];
+    return '<li class="stop'+(on?' done':'')+'">'+
+      '<input type="checkbox" id="'+id+'"'+(on?' checked':'')+' aria-label="Done: '+esc(name)+'">'+
+      (time!==null?'<time>'+esc(time)+'</time>':'')+
+      '<label for="'+id+'"><b>'+esc(name)+'</b>'+(note?'<small>'+esc(note)+'</small>':'')+'</label>'+
+      (q?'<a class="nav" href="'+nav(q)+'" target="_blank" rel="noopener">Navigate</a>':(time!==null?'<span></span>':''))+
+      '</li>';
+  }
+
+  var daysEl=document.getElementById("days"), navEl=document.getElementById("daynav"), html="", navHtml="";
+  DAYS.forEach(function(day){
+    var isToday=day.iso===todayIso;
+    navHtml+='<li><a href="#'+day.id+'"'+(isToday?' class="today"':'')+'>'+day.w+' '+day.d+(isToday?' · today':'')+'</a></li>';
+    html+='<article class="day'+(day.key?' key':'')+(isToday?' today':'')+'" id="'+day.id+'">'+
+      '<div class="dayhead"><div class="date"><b>'+day.d+'</b><span>'+day.w+'</span></div>'+
+      '<div class="grow"><h3>'+esc(day.title)+(day.key?' <span class="tag">Main day</span>':'')+'</h3><p class="stay">'+esc(day.stay)+'</p></div>'+
+      '<span class="count" data-count="'+day.id+'"></span></div><ol class="stops">';
+    day.stops.forEach(function(st,i){html+=row(day.id+"-"+i,st[0],st[1],st[2],st[3]);});
+    html+='</ol>'+(day.note?'<p class="note">'+esc(day.note)+'</p>':'')+
+      '<div class="notes"><label for="note-'+day.id+'">Notes for this day</label>'+
+      '<textarea id="note-'+day.id+'" data-note="'+day.id+'" placeholder="Hotel name, driver number, what to remember">'+esc(state.notes[day.id]||"")+'</textarea></div></article>';
+  });
+  daysEl.innerHTML=html; navEl.innerHTML=navHtml;
+  function list(el,prefix,items){
+    var h=""; items.forEach(function(it,i){h+=row(prefix+"-"+i,null,it[0],it[1],"");}); document.getElementById(el).innerHTML=h;
+  }
+  list("book","book",BOOK); list("pack","pack",PACK);
+
+  function refresh(){
+    var total=0,done=0;
+    DAYS.forEach(function(day){
+      var d=0; day.stops.forEach(function(_,i){if(state.done[day.id+"-"+i])d++;});
+      total+=day.stops.length; done+=d;
+      document.querySelector('[data-count="'+day.id+'"]').textContent=d+" / "+day.stops.length;
+    });
+    document.getElementById("overallText").textContent=done+" of "+total+" stops done";
+    document.getElementById("overallBar").style.width=(total?Math.round(done/total*100):0)+"%";
+
+    var box=document.getElementById("next"), today=null;
+    DAYS.forEach(function(day){if(day.iso===todayIso)today=day;});
+    if(today){
+      var nx=null,idx=-1;
+      today.stops.forEach(function(st,i){if(nx===null&&!state.done[today.id+"-"+i]){nx=st;idx=i;}});
+      if(nx){
+        box.innerHTML='<span class="eyebrow">Next up · '+esc(nx[0])+'</span><span class="what">'+esc(nx[1])+'</span>'+
+          (nx[2]?'<span>'+esc(nx[2])+'</span>':'')+'<div class="row">'+
+          (nx[3]?'<a href="'+nav(nx[3])+'" target="_blank" rel="noopener">Navigate</a>':'')+
+          '<a href="#'+today.id+'">See today</a></div>';
+      }else{
+        box.innerHTML='<span class="eyebrow">Today</span><span class="what">All of today is done</span><div class="row"><a href="#'+today.id+'">See today</a></div>';
+      }
+    }else if(todayIso<"2026-12-13"){
+      var ms=new Date(2026,11,12)-new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      var n=Math.round(ms/86400000);
+      box.innerHTML='<span class="eyebrow">Countdown</span><span class="what">'+(n<=0?'The train leaves tonight at 11:10 PM':n+(n===1?' day':' days')+' until the train leaves Mumbai')+'</span>'+
+        '<span>Sat 12 Dec, 11:10 PM from Mumbai Central.</span><div class="row"><a href="#book">Booking checklist</a></div>';
+    }else{
+      box.innerHTML='<span class="eyebrow">Trip complete</span><span class="what">Jai Mahakal</span><span>'+done+' of '+total+' stops ticked.</span>';
+    }
+  }
+  document.getElementById("book").parentNode.id="book-panel";
+  refresh();
+
+  document.addEventListener("change",function(e){
+    var t=e.target;
+    if(t.type==="checkbox"&&t.id){
+      if(t.checked)state.done[t.id]=1; else delete state.done[t.id];
+      t.closest(".stop").classList.toggle("done",t.checked); save(); refresh();
+    }
+  });
+  document.addEventListener("input",function(e){
+    var t=e.target; if(t.dataset&&t.dataset.note){state.notes[t.dataset.note]=t.value; save();}
+  });
+  var reset=document.getElementById("reset"), armed=false, timer;
+  reset.addEventListener("click",function(){
+    if(!armed){armed=true; reset.textContent="Tap again to clear everything"; timer=setTimeout(function(){armed=false; reset.textContent="Clear all ticks and notes";},4000); return;}
+    clearTimeout(timer); state={done:{},notes:{}}; save();
+    armed=false; reset.textContent="Clear all ticks and notes";
+    Array.prototype.forEach.call(document.querySelectorAll('input[type="checkbox"]'),function(c){c.checked=false; c.closest(".stop").classList.remove("done");});
+    Array.prototype.forEach.call(document.querySelectorAll("textarea"),function(a){a.value="";});
+    refresh();
+  });
+})();
+</script>
+</body>
+</html>
